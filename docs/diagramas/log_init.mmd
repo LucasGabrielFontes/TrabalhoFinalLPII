@@ -1,0 +1,25 @@
+sequenceDiagram
+  participant MAIN as main()
+  participant INIT as TSLog::init
+  participant FS as filesystem
+  participant G as Estado Global
+  participant WR as TSLog::log
+  participant F as log file
+
+  MAIN->>INIT: init(cfg)
+  INIT->>FS: create_directories
+  FS-->>INIT: ok
+  INIT->>G: abrir FILE*, set cfg
+  INIT->>WR: log("TSLog iniciado")
+  WR->>G: lock
+  WR->>F: write
+  WR-->>G: unlock
+  loop threads
+    Thread->>WR: log(...)
+    WR->>G: lock
+    WR->>F: write (+ flush se ERROR)
+    WR-->>G: unlock
+  end
+  MAIN->>WR: log("Finalizando demo")
+  MAIN->>INIT: close()
+  INIT->>G: lock + write final + fclose

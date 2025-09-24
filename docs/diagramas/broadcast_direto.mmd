@@ -1,0 +1,13 @@
+sequenceDiagram
+  participant CH as ClientHandler
+  participant SRV as Server
+  participant LOG as TSLog
+  participant FILE as log file
+  CH->>SRV: onMessage(msg)
+  SRV->>LOG: debug(broadcast start)
+  LOG->>FILE: linha
+  loop clientes
+    SRV->>Cliente: send(msg)
+  end
+  SRV->>LOG: info(broadcast done)
+  LOG->>FILE: linha

@@ -1,0 +1,33 @@
+flowchart LR
+  subgraph Clients[Clientes]
+    C1[Cliente CLI]
+    Cn[Outros Clientes]
+  end
+  C1 -- TCP --> NET[(Socket TCP)]
+  Cn -- TCP --> NET
+  subgraph Server[Chat Server]
+    A[Accept Loop / Main Thread]
+    SrvCore[Server Core]
+    subgraph Handlers[ClientHandler Threads]
+      H1[ClientHandler 1]
+      Hn[ClientHandler N]
+    end
+    subgraph Disp[Dispatcher Thread]
+      D[Dispatcher]
+    end
+    Q[(ThreadSafeQueue<Message>)]
+    L[TSLog Wrapper]
+  end
+  L --> Lib[libtslog]
+  Lib --> LogFile[(logs/*.log)]
+  NET --> A
+  A --> SrvCore
+  SrvCore <-- registra --> H1
+  SrvCore <-- registra --> Hn
+  H1 --> Q
+  Hn --> Q
+  D --> NET
+  D --> L
+  H1 --> L
+  Hn --> L
+  A --> L
