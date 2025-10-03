@@ -9,25 +9,17 @@ flowchart LR
     A[Accept Loop / Main Thread]
     SrvCore[Server Core]
     subgraph Handlers[ClientHandler Threads]
-      H1[ClientHandler 1]
-      Hn[ClientHandler N]
+      H1[ClientHandler 1 - Thread]
+      Hn[ClientHandler N - Thread]
     end
-    subgraph Disp[Dispatcher Thread]
-      D[Dispatcher]
-    end
-    Q[(ThreadSafeQueue<Message>)]
     L[TSLog Wrapper]
   end
   L --> Lib[libtslog]
-  Lib --> LogFile[(logs/*.log)]
+  Lib --> LogFile[(logs/server.log)]
   NET --> A
   A --> SrvCore
   SrvCore <-- registra --> H1
   SrvCore <-- registra --> Hn
-  H1 --> Q
-  Hn --> Q
-  D --> NET
-  D --> L
   H1 --> L
   Hn --> L
   A --> L

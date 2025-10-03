@@ -1,25 +1,13 @@
 graph TD
-  Main[Main/Accept] --> CH1[ClientHandler 1]
-  Main --> CHn[ClientHandler N]
-  Main --> Disp[Dispatcher]
+  Main[Main/Accept] --> CH1[ClientHandler 1 - Thread]
+  Main --> CHn[ClientHandler N - Thread]
   Main --> LoggerInit[TSLog init]
-
   subgraph Sync[Mecanismos]
     M1[mutex clients_mutex]
-    M2[mutex queue_mutex]
-    CV[condition_variable]
-    SEM[[semaphore_conexoes - etapa3]]
     LM[mutex logger]
   end
-
-  CH1 --> Q[ThreadSafeQueue]
-  CHn --> Q
-  Q --> Disp
-  Disp --> M1
   CH1 --> M1
   CHn --> M1
-  Q --> M2
-  Disp --> CV
   CH1 --> LM
   CHn --> LM
   Main --> LM

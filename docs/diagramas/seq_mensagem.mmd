@@ -3,27 +3,22 @@ sequenceDiagram
   participant OS as Socket/TCP
   participant ACC as Accept Thread
   participant SRV as Server Core
-  participant CH as ClientHandler
-  participant Q as ThreadSafeQueue
-  participant DISP as Dispatcher
+  participant CH as ClientHandler (Thread)
   participant LOG as TSLog
   participant FILE as log file
-
   CLI->>OS: connect()
   OS-->>ACC: nova conexão
   ACC->>SRV: add_client()
-  ACC->>LOG: info(conexão)
+  ACC->>LOG: info("Novo cliente conectado")
   LOG->>FILE: linha
-
   CLI->>CH: send(msg)
-  CH->>LOG: debug(recv)
+  CH->>LOG: debug("Mensagem recebida")
   LOG->>FILE: linha
-
-  CH->>Q: enqueue(msg)
-  Q-->>DISP: sinal condvar
-  DISP->>SRV: snapshot clientes (mutex)
-  DISP->>LOG: info(broadcast)
+  CH->>SRV: broadcast(msg)
+  SRV->>LOG: info("Broadcast iniciado")
   LOG->>FILE: linha
   loop para cada cliente
-    DISP->>OS: send(msg)
+    SRV->>OS: send(msg)
   end
+  SRV->>LOG: info("Broadcast concluído")
+  LOG->>FILE: linha
